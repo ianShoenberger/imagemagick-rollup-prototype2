@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>test</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- End Google Tag Manager -->
+
+    <META name="keywords" content="Snap to Frame">
+
+    <meta name="viewport" content="user-scalable=yes, width=device-width" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&amp;subset=latin-ext" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+  </head>
+  
+  <body id='app-body'>
+    <div id="app">
+      <input
+        type="file"
+        id="imagepicker"
+        multiple
+        accept="image/*, .heic" />
+    </div>
+    <script src="./renderQueue.js"></script>
+    <script>
+	    const renderQueue = new RenderQueue((dataUrl) => {
+        console.log(dataUrl)
+      })
+      const input = document.getElementById('imagepicker')
+      input.addEventListener('change', (e) => {
+        for (let i = 0; i < e.target.files.length; i++) {
+          const file = e.target.files[i]
+
+          const picObject = {
+            // counter: context.picsCounter++,
+            // input: currentInputIndex,
+            counter: 0,
+            input: 0,
+            index: i,
+            name: file.name,
+            size: file.size,
+            uploadProgress: undefined,
+            uploadedBytes: 0,
+            file: file,
+            thumbnail: '',
+            // isHeicHeif: context.isHeicHeif(file)
+            isHeicHeif: null
+          }
+
+          // context.pics.push(picObject)
+
+          // if (loadThumbnails) {
+          renderQueue.add(picObject)
+          // }
+        }
+      })
+    </script>
+
+  </body>
+</html>
