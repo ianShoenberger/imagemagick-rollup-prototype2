@@ -30,7 +30,10 @@
     <script src="./renderQueue.js"></script>
     <script>
 	    const renderQueue = new RenderQueue((dataUrl) => {
-        console.log(dataUrl)
+        const img = new Image(104, 104)
+        img.setAttribute('src', dataUrl)
+        const appEl = document.getElementById('app')
+        appEl.appendChild(img)
       })
       const input = document.getElementById('imagepicker')
       input.addEventListener('change', (e) => {
