@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "rollup --config && npm run move-dist && npm run move-wasm",
+    "build": "rollup --config && npm run move-dist",
     "test": "echo \"Error: no test specified\" && exit 1",
     "move-dist": "node -e \"require('fs-extra').copySync('./dist/', './demo/')\"",
     "move-wasm": "node -e \"require('fs-extra').copySync('./node_modules/@imagemagick/magick-wasm/dist/magick.wasm', './demo/magick.wasm')\"",

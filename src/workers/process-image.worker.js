@@ -5,30 +5,23 @@ import {
   Magick,
   Quantum
 } from '@imagemagick/magick-wasm'
-// import wasm from '../../assets/wasm/magick.wasm'
+import wasm from '../../node_modules/@imagemagick/magick-wasm/dist/magick.wasm'
 
 const initialized = (async () => {
   // initialize module w/ wasm
-  // const magickWasmURL = new URL('../../assets/wasm/magick.wasm', import.meta.url)
-  // const wasmModule = await wasm()
-  // const wasmInstance = new WebAssembly.Instance(wasmModule)
-  // console.log(wasmInstance.exports.main())
-  // const result = await axios.get('http://localhost:8084/assets/sample.wasm', {
-  //   responseType: 'arraybuffer'
-  // })
-  // const mod = await WebAssembly.compile(result.data)
-  // const instance = await  WebAssembly.instantiate(mod)
-  const wasmUrl = new URL('http://localhost:8084/magick.wasm')
-  console.log(wasmUrl)
-  await initializeImageMagick(wasmUrl)
+
+  /** THIS ALSO WORKED */
+  // const wasmUrl = new URL('http://localhost:8084/magick.wasm')
+  // await initializeImageMagick(wasmUrl)
+
+  /** BUT NOW THIS IS THE WAY */
+  const instance = await wasm();
+  await initializeImageMagick(instance);
   console.log(Magick.imageMagickVersion);
   console.log('Delegates:', Magick.delegates);
   console.log('Features:', Magick.features);
   console.log('Quantum:', Quantum.depth);
 })()
-
-  // .then((wasmModule) => WebAssembly.instantiate(wasmModule))
-  // .then((instance) => instance.exports.main())
 
 const onLoadEnd = (callback) => async (event) => {
   // create file buffer
