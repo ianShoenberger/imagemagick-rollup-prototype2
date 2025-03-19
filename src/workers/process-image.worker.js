@@ -23,9 +23,22 @@ const initialized = (async () => {
   console.log('Quantum:', Quantum.depth);
 })()
 
-const onLoadEnd = (callback) => async (event) => {
-  // create file buffer
-  const buffer = new Uint8Array(event.target.result)
+function base64ToArrayBuffer(base64) {
+  const binaryString = atob(base64);
+  const length = binaryString.length;
+  const bytes = new Uint8Array(length);
+
+  for (let i = 0; i < length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+const onLoadEnd = async (callback, base64, fileName) => {
+  // we could normally do FileReader.readAsArrayBuffer() -> new Uint8Array but....
+  // since we are doing this for smart cards, we get a base64 string and need to convert that to typed array (Uint8Array)
+  // create typed array
+  const buffer = base64ToArrayBuffer(base64)
 
   // read image buffer
   ImageMagick.read(buffer, async (image) => {
@@ -36,8 +49,10 @@ const onLoadEnd = (callback) => async (event) => {
       image.autoOrient()
     }
 
-    // down-size image (can be updated accordingly)
-    image.resize(200, 200)
+    if (image.height > 1536 || image.width > 1536) {
+      // down-size image
+      image.resize(1536, 1536) // this doesn't actually make a square - it maintains aspect ratio
+    }
 
     // we don't have access to DOM, so we create an OffscreenCanvas
     const canvas = new OffscreenCanvas(image.width, image.height)
@@ -50,7 +65,7 @@ const onLoadEnd = (callback) => async (event) => {
 
     // read blob and return dataURL
     const reader = new FileReader()
-    reader.onload = () => callback(reader.result)
+    reader.onload = () => callback(reader.result, fileName)
     reader.readAsDataURL(blob)
   })
 }
@@ -63,16 +78,17 @@ self.onmessage = async function (event) {
   await initialized
 
   // declarations
-  const { file } = event.data
+  const { file, name } = event.data
 
   // send dataURL back to Queue
-  const callback = (dataURL) => {
-    this.postMessage(dataURL)
+  const callback = (dataURL, fileName) => {
+    this.postMessage({ dataURL, fileName })
   }
 
   // read file
-  const reader = new FileReader()
-  reader.onloadend = onLoadEnd(callback)
-  reader.onerror = onError
-  reader.readAsArrayBuffer(file)
+  // const reader = new FileReader()
+  // reader.onloadend = onLoadEnd(callback)
+  // reader.onerror = onError
+  // reader.readAsArrayBuffer(file)
+  onLoadEnd(callback, file, name)
 }

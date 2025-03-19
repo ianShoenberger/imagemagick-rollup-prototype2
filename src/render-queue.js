@@ -4,8 +4,8 @@ import ImageWorker from 'web-worker:./workers/process-image.worker'
  * Leverages workers to offset workload from main thread.
  */
 export default class RenderQueue {
-  constructor (updatePicThumbnail) {
-    this.updatePicThumbnail = updatePicThumbnail
+  constructor (clientCallback) {
+    this.clientCallback = clientCallback
     this.maxWorkers = navigator.hardwareConcurrency - 1
     this.availableWorkers = []
     this.queue = []
@@ -69,10 +69,10 @@ export default class RenderQueue {
   onMessage (job) {
     const queue = this
     const availableWorkers = this.availableWorkers
-    const updatePicThumbnail = this.updatePicThumbnail
+    const clientCallback = this.clientCallback
     return function (event) {
-      const { data } = event
-      updatePicThumbnail(data, job.counter)
+      const { dataURL, fileName } = event.data
+      clientCallback(dataURL, fileName)
       availableWorkers.push(this)
       queue.dispatch()
     }

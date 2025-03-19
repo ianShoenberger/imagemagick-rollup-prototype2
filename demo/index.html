@@ -29,11 +29,12 @@
     </div>
     <script src="./renderQueue.js"></script>
     <script>
-	    const renderQueue = new RenderQueue((dataUrl) => {
-        const img = new Image(104, 104)
+	    const renderQueue = new RenderQueue((dataUrl, fileName) => {
+        const img = new Image()
         img.setAttribute('src', dataUrl)
         const appEl = document.getElementById('app')
         appEl.appendChild(img)
+        console.log(fileName)
       })
       const input = document.getElementById('imagepicker')
       input.addEventListener('change', (e) => {
@@ -41,8 +42,6 @@
           const file = e.target.files[i]
 
           const picObject = {
-            // counter: context.picsCounter++,
-            // input: currentInputIndex,
             counter: 0,
             input: 0,
             index: i,
@@ -52,15 +51,17 @@
             uploadedBytes: 0,
             file: file,
             thumbnail: '',
-            // isHeicHeif: context.isHeicHeif(file)
             isHeicHeif: null
           }
-
-          // context.pics.push(picObject)
-
-          // if (loadThumbnails) {
-          renderQueue.add(picObject)
-          // }
+          // read file
+          const reader = new FileReader()
+          reader.onloadend = (event) => {
+            picObject.file = event.target.result.split(',')[1]
+            renderQueue.add(picObject)
+          }
+          reader.onerror = (err) => console.log(err.message)
+          // reader.readAsArrayBuffer(file)
+          reader.readAsDataURL(file)
         }
       })
     </script>
